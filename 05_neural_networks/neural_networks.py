@@ -88,12 +88,9 @@ class NeuralNetwork(object):
         #############################################################################
         # TODO: Implement the affine backward pass.                                 #
         #############################################################################
-        N = X.shape[0]
-        D = X.shape[1]
-
         dX = dUpper.dot(W.T)
-        db = np.sum(dUpper, axis=0)
         dW = X.T.dot(dUpper)
+        db = np.sum(dUpper, axis=0)
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
@@ -225,10 +222,12 @@ class NeuralNetwork(object):
         # TODO: Perform a forward pass on the network and store the caches of       #
         # each layer inside the cache_list                                          #
         #############################################################################
-        layer1, fc_cache = self.fully_connected_forward(X, self.params['W1'], self.params['b1'])
-        hidden, hidden_cache = self.sigmoid_forward(layer1)
-        scores, out_cache = self.fully_connected_forward(hidden, self.params['W2'], self.params['b2'])
-        cache_list = (fc_cache, hidden_cache, out_cache)
+        cache_list = []
+        layer1, cache1 = self.fully_connected_forward(X, self.params['W1'], self.params['b1'])
+        hidden, cache2 = self.sigmoid_forward(layer1)
+        scores, cache3 = self.fully_connected_forward(hidden, self.params['W2'], self.params['b2'])
+        #hidden, cache4 = self.sigmoid_forward(scores)
+        cache_list = [cache1, cache2, cache3]
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
@@ -257,7 +256,7 @@ class NeuralNetwork(object):
         
         delta1, grads['W2'], grads['b2'] = self.fully_connected_backward(dloss, cache_list[2])
         delta2 = self.sigmoid_backward(delta1, cache_list[1])
-        delta3, grads['W1'], grads['b1'] = self.fully_connected_backward(delta2, cache_list[0]) 
+        delta3, grads['W1'], grads['b1'] = self.fully_connected_backward(delta2, cache_list[0])
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################

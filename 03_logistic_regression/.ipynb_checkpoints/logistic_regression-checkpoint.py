@@ -69,6 +69,7 @@ class LogisticRegression(object):
         # TODO: Compute for the predictions of the model on new data using the      #
         # learned weight vectors.                                                   #
         #############################################################################
+    
         prediction = np.round(self.sigmoid(np.dot(X, W) + b))
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -90,6 +91,7 @@ class LogisticRegression(object):
         #############################################################################
         # TODO: Implement binary cross entropy                                      #
         #############################################################################
+        
         bce = np.sum(labels * np.log(probs) + (1-labels) * np.log(1 - probs)) / len(labels) * -1
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -143,6 +145,7 @@ class LogisticRegression(object):
         #############################################################################
         grads['W'] = (X.T.dot((prediction - y))) * (1 / N)
         grads['b'] = np.sum(prediction - y) * (1 / N)
+
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################

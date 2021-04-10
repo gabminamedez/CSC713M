@@ -38,9 +38,9 @@ def compute_numerical_gradient(generic_function, variable, h=1e-5):
         # TODO: Create a copy of the original value of current element of           #
         # `variable`.                                                               #
         #############################################################################
+        variable_copy = variable.copy()
         theta_plus = variable.copy()
         theta_minus = variable.copy()
-        exact_copy = variable.copy()
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
@@ -61,7 +61,7 @@ def compute_numerical_gradient(generic_function, variable, h=1e-5):
         #############################################################################
         # TODO: Restore the current elemend of `variable` to its original value.    #
         #############################################################################
-        variable[idx] = exact_copy[idx]
+        variable[idx] = variable_copy[idx]
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
