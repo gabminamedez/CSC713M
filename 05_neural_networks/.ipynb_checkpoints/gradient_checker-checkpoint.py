@@ -38,9 +38,9 @@ def compute_numerical_gradient(generic_function, variable, h=1e-5):
         # TODO: Create a copy of the original value of current element of           #
         # `variable`.                                                               #
         #############################################################################
-        variable_copy = variable.copy()
         theta_plus = variable.copy()
         theta_minus = variable.copy()
+        variable_copy = variable[idx]
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
@@ -49,10 +49,10 @@ def compute_numerical_gradient(generic_function, variable, h=1e-5):
         # TODO: Compute for the numerical gradient of the current element using     #
         # the central difference formula.                                           #
         #############################################################################
-        theta_plus[idx] = variable[idx] + h
-        theta_minus[idx] =  variable[idx] - h
-        forward = generic_function(theta_plus)
-        backward = generic_function(theta_minus)
+        variable[idx] = variable_copy + h
+        forward = generic_function(variable)
+        variable[idx] = variable_copy - h
+        backward = generic_function(variable)
         grad[idx] = (forward - backward) / (2 * h)
         #############################################################################
         #                             END OF YOUR CODE                              #
@@ -61,7 +61,7 @@ def compute_numerical_gradient(generic_function, variable, h=1e-5):
         #############################################################################
         # TODO: Restore the current elemend of `variable` to its original value.    #
         #############################################################################
-        variable[idx] = variable_copy[idx]
+        variable[idx] = variable_copy
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################

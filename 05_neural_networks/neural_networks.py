@@ -184,10 +184,11 @@ class NeuralNetwork(object):
         #############################################################################
         # TODO: Compute for the softmax cross entropy loss                          #
         #############################################################################
-        probs = np.exp(scores - np.max(scores, axis=1, keepdims=True))
-        probs /= np.sum(probs, axis=1, keepdims=True)
+        probs = self.softmax(scores)
         N = scores.shape[0]
-        loss = -np.sum(np.log(probs[np.arange(N), labels])) / N
+        ohl = np.zeros((len(labels), np.max(labels) + 1)).astype(int)
+        ohl[np.arange(len(labels)), labels] = 1
+        loss = -np.sum(ohl * np.log(probs)) / N
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
@@ -226,7 +227,6 @@ class NeuralNetwork(object):
         layer1, cache1 = self.fully_connected_forward(X, self.params['W1'], self.params['b1'])
         hidden, cache2 = self.sigmoid_forward(layer1)
         scores, cache3 = self.fully_connected_forward(hidden, self.params['W2'], self.params['b2'])
-        #hidden, cache4 = self.sigmoid_forward(scores)
         cache_list = [cache1, cache2, cache3]
         #############################################################################
         #                             END OF YOUR CODE                              #
@@ -298,8 +298,6 @@ class NeuralNetwork(object):
         # the weights of each layer.                                                #
         #############################################################################
         loss, dloss = self.softmax_cross_entropy_loss(scores, y)
-
-        loss = loss + 0.5 * lambda_reg * np.sum(self.params['W1'] ** 2) + 0.5 * lambda_reg * np.sum(self.params['W2'] ** 2)
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -314,6 +312,8 @@ class NeuralNetwork(object):
         grads = self.network_backward(dloss, cache_list)
         grads['W2'] += lambda_reg * self.params['W2']
         grads['W1'] += lambda_reg * self.params['W1']
+        grads['b2'] += lambda_reg * self.params['b2']
+        grads['b1'] += lambda_reg * self.params['b1']
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
