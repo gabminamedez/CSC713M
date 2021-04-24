@@ -23,13 +23,17 @@ class ClassificationTree(DecisionTree):
         #########################################################################
         # TODO: Implement Shannon's entropy                                     #
         #########################################################################
-        entropy = None
+        y = np.atleast_2d(y)
+        nrows, ncols = y.shape
+        nbins = y.max() + 1
+        counts = np.vstack((np.bincount(row, minlength=nbins) for row in y))
+        p = counts / float(ncols)
+        entropy = -np.sum(p * np.log2(p), axis=1)
         #########################################################################
         #                              END OF YOUR CODE                         #
         ######################################################################### 
         return entropy
-
-        
+   
     def information_gain(self,y_S, y_A, y_B):
         """
         Computes for the reduction of information / entropy after the split. 

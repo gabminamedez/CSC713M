@@ -46,7 +46,7 @@ class DecisionTree(object):
         # build the tree and remember the root node
         self.root_node = self.create_tree(X, y)
 
-    def create_tree(self,X, y, depth=0):
+    def create_tree(self, X, y, depth=0):
         """
         Top-down approach for building decision trees (recursive definition).
 
@@ -64,13 +64,24 @@ class DecisionTree(object):
         #########################################################################
         # TODO: Build the tree recursively.                                     #
         #########################################################################
-        
+        node = TreeNode()
+
+        if depth < self.max_depth:
+            best_gini, best_idx, best_threshold, split_idx = self.choose_best_feature_split(X, y)
+            if best_idx is not None:
+                indices_left = X[:, best_idx] < best_threshold
+                X_left, y_left = X[indices_left], y[indices_left]
+                X_right, y_right = X[~indices_left], y[~indices_left]
+                node.feature = best_idx
+                node.threshold = best_threshold
+                node.value = best_gini
+                node.left_branch = self._grow_tree(X_left, y_left, depth + 1)
+                node.right_branch = self._grow_tree(X_right, y_right, depth + 1)
+
+        return node
         #########################################################################
         #                              END OF YOUR CODE                         #
         #########################################################################  
-
-        
-
 
     def choose_best_feature_split(self, X, y):
         """
@@ -100,11 +111,40 @@ class DecisionTree(object):
         #########################################################################
         # TODO: Choose the best feature to split on.                            #
         #########################################################################
+        m = y.size
+        if m <= 1:
+            return None, None, None, None
 
+        num_parent = [np.sum(y == c) for c in range(len(set(y)))]
+
+        best_gini = 1.0 - sum((n / m) ** 2 for n in num_parent)
+        best_idx, best_threshold = None, None
+
+        for idx in range(D):
+            thresholds, classes = zip(*sorted(zip(X[:, idx], y)))
+
+            num_left = [0] * len(set(y))
+            num_right = num_parent.copy()
+            for i in range(1, m):
+                c = classes[i - 1]
+                num_left[c] += 1
+                num_right[c] -= 1
+                gini_left = 1.0 - sum((num_left[x] / i) ** 2 for x in range(len(set(y))))
+                gini_right = 1.0 - sum((num_right[x] / (m - i)) ** 2 for x in range(len(set(y))))
+
+                gini = (i * gini_left + (m - i) * gini_right) / m
+
+                if thresholds[i] == thresholds[i - 1]:
+                    continue
+
+                if gini < best_gini:
+                    best_gini = gini
+                    best_idx = idx
+                    best_threshold = (thresholds[i] + thresholds[i - 1]) / 2
         #########################################################################
         #                              END OF YOUR CODE                         #
         ######################################################################### 
-        return max_impurity, best_feature, best_threshold, split_idx
+        return best_gini, best_idx, best_threshold, split_idx
     
     def traverse_tree(self, X, node):
         """
@@ -164,7 +204,6 @@ class DecisionTree(object):
             prediction.append(pred)
 
         return prediction
-
     
     def compute_leaf(self, y):
         raise NotImplementedError("Should be implemented in the subclass")
@@ -201,7 +240,6 @@ class DecisionTree(object):
                 text = node.value
                 plotNode(plt_axis, text, center_pt, parent_pt, node.node_type)
                 
-        
         def plotNode(axis, text, center_point, parent_point, node_type):
             decNode = dict(boxstyle="round, pad=0.5", fc='0.8')
             leafNode = dict(boxstyle="round, pad=0.5", fc="0.8")
@@ -218,19 +256,6 @@ class DecisionTree(object):
                 axis.annotate(text, xy=parent_point, xytext=center_point, 
                     va="center", ha="center", bbox=boxstyle, arrowprops=arrow_args, size=15)
 
-        
-        
         plt.figure(figsize=(13,15))
         plt_axis = plt.subplot(111, frameon=False)
         traverse_tree_viz(self.root_node, None, (0.5,1))
-        
-
-
-
-
-
-
-
-            
-                
-    
